@@ -3,12 +3,12 @@ import pandas as pd
 import os
 from transformers import TextStreamer
 
-from .prompt import prompt_template
+from prompt import prompt_template
 
 model_name = 'meta-llama/Llama-2-7b-chat-hf'
 model = transformers.AutoModelForCausalLM.from_pretrained(
     model_name, torch_dtype=torch.bfloat16, device_map='cuda',
-    cache_dir='./workspace', token=os.getenv('HF_TOKEN')
+    token=os.getenv('HF_TOKEN')
 )
 
 tokenizer = transformers.AutoTokenizer.from_pretrained(
@@ -29,8 +29,8 @@ streamer = TextStreamer(tokenizer)
 reft_config = pyreft.ReftConfig(
     representations={
         "layer":15,
-        # "component":"block_output",
-        "component": "model.layers[0].output",
+        "component":"block_output",
+        # "component": "model.layers[0].output",
         "low_rank_dimension":4,
         "intervention":pyreft.LoreftIntervention(
             embed_dim=model.config.hidden_size, low_rank_dimension=4
@@ -56,10 +56,10 @@ data_module = pyreft.make_last_position_supervised_data_module(
 
 # Training arguments
 training_arguments = transformers.TrainingArguments(
-    num_train_epochs=100,
+    num_train_epochs=50,
     output_dir='./models',
     per_device_train_batch_size=2,
-    learning_rate=2e-3,
+    learning_rate=4e-3,
     logging_steps=20,
     report_to=[]
 )
@@ -78,5 +78,5 @@ _ = trainer.train()
 # Save the model
 reft_model.set_device('cpu')
 reft_model.save(
-    save_directory='./trained_intervention'
+    save_directory='./reft_intervention_model'
 )

@@ -1,6 +1,17 @@
 # ReFT
 
-TODO: Fill out and mention Arxiv Dives
+Here is a small implementation of ReFT to go along with our weekly Arxiv Dive.
+
+# Training / Test
+
+```bash
+# Download the minimal training data
+oxen download ox/oxen-qa train.jsonl
+# Train the model
+python train.py
+# Test the model
+python -i test.py
+```
 
 # Acknowledgements
 
